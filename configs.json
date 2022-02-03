@@ -1,0 +1,14 @@
+{
+  "account1": {
+    "port": 8001
+  },
+  "account2": {
+    "port": 8002
+  },
+  "account3": {
+    "port": 8003
+  },
+  "account4": {
+    "port": 8004
+  }
+}
