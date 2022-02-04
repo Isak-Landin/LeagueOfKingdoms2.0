@@ -45,6 +45,7 @@ class start:
     def login_to_kingdom(self):
         accounts = self.all_selenium_to_devtools_list
 
+        # Entering www.leagueofkingdoms.com and clicking play, then exiting first tab
         for account in accounts:
             account[0].get('https://leagueofkingdoms.com')
             try:
@@ -52,9 +53,44 @@ class start:
                     .until(EC.presence_of_element_located((By.XPATH, '//*[@id="top"]/div/div[2]/img[1]')))
 
                 play_button.click()
+
+                # Get both open tabs and change the handle to the new tab
+                both_handles = account[0].window_handles
+                current_handle = account[0].current_window_handle
+
+                # Switch handle
+                for new_handle in both_handles:
+                    # switch focus to child window
+                    if (new_handle != current_handle):
+                        account[0].switch_to.window(new_handle)
+
+                print('both handles: ', both_handles)
+
+                tabs = account[1].list_tab()
+                print(tabs)
+                account[1].close_tab(tab_id=tabs[1])
+                tabs = account[1].list_tab()
+                print(tabs)
+
+                print('Now you should only be seeing the loading screen,'
+                      ' if you are seeing another tab please contact me')
+
             except:
                 print(traceback.print_exc())
-                exit("Couldn't find the play button on the website")
-            time.sleep(1000)
+                exit("Uh oh, something went wrong")
+
+        for account in accounts:
+            try:
+                disable_notifications = WebDriverWait(account[0], 200)\
+                    .until(EC.presence_of_element_located((By.XPATH, '//*[@id="onesignal-slidedown-cancel-button"]')))
+                disable_notifications.click()
+            except:
+                print(traceback.print_exc())
+                print(f'We could not find the notifications button for the given time-span for {account[0]}')
+                continue
+
+        for account in accounts
+
+
 
 starter = start()
