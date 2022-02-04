@@ -30,6 +30,9 @@ class start:
 
         """ Entering leagueofkingdoms and login in to all accounts """
         self.login_to_kingdom()
+        
+    def execute_chrome_startup(self):
+        pass
 
     def start_selenium_port(self):
         for i in range(self.length_accounts):
