@@ -10,11 +10,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import traceback
+import executing_chrome as exe_chrome
 
 PATH_web_scripts = str(pathlib.Path().resolve())
-PATH_json_configs = PATH_web_scripts.replace('web_scripts', 'configs.json')
+PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
 
-class start:
+
+class Start:
     def __init__(self):
         self.all_selenium_to_devtools_list = []
 
@@ -24,26 +26,16 @@ class start:
         print(self.data)
         self.length_accounts = len(self.data)
 
-        """ Launching all selenium browser---- Equivalent to the number of accounts found in file """
-        self. start_selenium_port()
-        print(self.all_selenium_to_devtools_list)
-
-        """ Entering leagueofkingdoms and login in to all accounts """
-        self.login_to_kingdom()
-        
-    def execute_chrome_startup(self):
-        pass
-
     def start_selenium_port(self):
         for i in range(self.length_accounts):
             port = "800" + str(i)
-            options = webdriver.ChromeOptions()
-            options.add_argument(f"--remote-debugging-port={port}")
-            driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+            driver = exe_chrome.start_chrome(port=port)
 
             dev_tools = pychrome.Browser(url=f"http://localhost:{port}")
 
-            self.all_selenium_to_devtools_list.append([driver, dev_tools])
+            self.all_selenium_to_devtools_list.append([driver, dev_tools, self.data[i]])
+
+            return self.all_selenium_to_devtools_list
 
     def login_to_kingdom(self):
         instances = self.all_selenium_to_devtools_list
@@ -93,8 +85,4 @@ class start:
                 continue
 
         for instance in instances:
-
-
-
-
-starter = start()
+            pass

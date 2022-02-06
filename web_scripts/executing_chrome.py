@@ -3,8 +3,15 @@ import pathlib
 import shutil
 import time
 import traceback
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 
-path_to_chrome_instances = str(pathlib.Path(__file__).parent.resolve()) + '\\' + 'instances_of_chrome'
+path = str(pathlib.Path(__file__).parent.resolve())
+path_to_chrome_instances = path + r'\instances_of_chrome'
 
 
 def remove_all_existing_instances():
@@ -19,17 +26,33 @@ def remove_all_existing_instances():
                     shutil.rmtree(path_to_chrome_instances + '\\' + str(file))
 
                 except:
+                    print(traceback.print_exc())
                     time.sleep(10)
 
+
 def start_chrome(port):
+    driver = None
     try:
-        new_directory = path_to_chrome_instances + '\\' + str(port)
+        command = fr'start chrome.exe --remote-debugging-port={port} --user-data-dir={path}' \
+                  + r'\instances_of_chrome' + fr'\{port}'
+        print('Creating directory')
+        new_directory = path_to_chrome_instances + fr'\{port}'
+        print(new_directory)
         os.mkdir(new_directory)
-        print(f"start chrome.exe -–remote-debugging-port={port} --user-data-dir={new_directory}")
-        os.system(f'cmd /k "start chrome.exe -–remote-debugging-port={port} -–user-data-dir={new_directory}"')
+        print(command)
+        os.system(command)
+
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
+
+        driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
 
     except:
         print(traceback.print_exc())
 
-remove_all_existing_instances()
-start_chrome(8002)
+    finally:
+        if driver is not None:
+            return driver
+
+
+
