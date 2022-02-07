@@ -100,5 +100,8 @@ class Start:
                 print(f'We could not find the notifications button for the given time-span for {instance[0]}')
                 continue
 
-        for instance in instances:
-            pass
+        for instance in self.session_data:
+            login_method = self.data[instance]['login_method']
+
+            if login_method == 'google':
+                pass
