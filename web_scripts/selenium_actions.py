@@ -11,6 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import traceback
 import executing_chrome as exe_chrome
+import pygetwindow
 
 PATH_web_scripts = str(pathlib.Path().resolve())
 PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
@@ -18,6 +19,7 @@ PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
 
 class Start:
     def __init__(self):
+        self.session_data = {}
         self.all_selenium_to_devtools_list = []
 
         with open(PATH_json_configs, 'r+') as file:
@@ -26,6 +28,11 @@ class Start:
         print(self.data)
         self.length_accounts = len(self.data)
 
+        self.all_keys = []
+
+        for key in self.data:
+            self.all_keys.append(key)
+
     def start_selenium_port(self):
         for i in range(self.length_accounts):
             port = "800" + str(i)
@@ -33,39 +40,47 @@ class Start:
 
             dev_tools = pychrome.Browser(url=f"http://localhost:{port}")
 
-            self.all_selenium_to_devtools_list.append([driver, dev_tools, self.data[i]])
+            self.session_data[self.all_keys[i]] = {}
+            self.session_data[self.all_keys[i]]['driver'] = driver
+            self.session_data[self.all_keys[i]]['dev_tools'] = dev_tools
 
-            return self.all_selenium_to_devtools_list
+            return self.session_data
 
-    def login_to_kingdom(self):
-        instances = self.all_selenium_to_devtools_list
+    def get_to_kingdom(self, accounts):
+        instances = accounts
 
         # Entering www.leagueofkingdoms.com and clicking play, then exiting first tab
         for instance in instances:
-            instance[0].get('https://leagueofkingdoms.com')
+            driver = instances[instance]['driver']
+            print('This is your driver: ', driver)
+            driver.get('https://leagueofkingdoms.com')
             try:
-                play_button = WebDriverWait(instance[0], 30)\
+                play_button = WebDriverWait(driver, 30)\
                     .until(EC.presence_of_element_located((By.XPATH, '//*[@id="top"]/div/div[2]/img[1]')))
 
                 play_button.click()
 
                 # Get both open tabs and change the handle to the new tab
-                both_handles = instance[0].window_handles
-                current_handle = instance[0].current_window_handle
+                both_handles = driver.window_handles
+                current_handle = driver.current_window_handle
 
                 # Switch handle
                 for new_handle in both_handles:
                     # switch focus to child window
                     if new_handle != current_handle:
-                        instance[0].switch_to.window(new_handle)
+                        driver.switch_to.window(new_handle)
 
                 print('both handles: ', both_handles)
 
-                tabs = instance[1].list_tab()
+                tabs = instances[instance]['dev_tools'].list_tab()
                 print(tabs)
-                instance[1].close_tab(tab_id=tabs[1])
-                tabs = instance[1].list_tab()
+                instances[instance]['dev_tools'].close_tab(tab_id=tabs[1])
+                tabs = instances[instance]['dev_tools'].list_tab()
                 print(tabs)
+
+                tab = instances[instance]['dev_tools'].list_tab()[0]
+
+                self.session_data[instance]['tab'] = tab
 
                 print('Now you should only be seeing the loading screen,'
                       ' if you are seeing another tab please contact me')
@@ -75,8 +90,9 @@ class Start:
                 exit("Uh oh, something went wrong")
 
         for instance in instances:
+            driver = instances[instance]['driver']
             try:
-                disable_notifications = WebDriverWait(instance[0], 200)\
+                disable_notifications = WebDriverWait(driver, 200)\
                     .until(EC.presence_of_element_located((By.XPATH, '//*[@id="onesignal-slidedown-cancel-button"]')))
                 disable_notifications.click()
             except:
