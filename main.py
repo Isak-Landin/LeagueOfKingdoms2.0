@@ -22,3 +22,4 @@ instances_for_accounts = initiate_selenium_actions.session_data
 print('This is all the session data: ', instances_for_accounts)
 
 initiate_selenium_actions.get_to_kingdom(accounts=instances_for_accounts)
+

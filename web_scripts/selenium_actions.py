@@ -12,6 +12,7 @@ from selenium.common.exceptions import TimeoutException
 import traceback
 import executing_chrome as exe_chrome
 import pygetwindow
+import gui_methods
 
 PATH_web_scripts = str(pathlib.Path().resolve())
 PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
@@ -19,6 +20,7 @@ PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
 
 class Start:
     def __init__(self):
+        self.all_chrome_windows = []
         self.session_data = {}
         self.all_selenium_to_devtools_list = []
 
@@ -38,11 +40,25 @@ class Start:
             port = "800" + str(i)
             driver = exe_chrome.start_chrome(port=port)
 
+            windows = pygetwindow.getWindowsWithTitle('Chrome')
+            window_id = ''
+
+            for window in windows:
+                if window not in self.all_chrome_windows:
+                    self.all_chrome_windows.append(window)
+
+                    window_id = window
+
+                    # Testing Area
+
+                    print(window.isActive)
+
             dev_tools = pychrome.Browser(url=f"http://localhost:{port}")
 
             self.session_data[self.all_keys[i]] = {}
             self.session_data[self.all_keys[i]]['driver'] = driver
             self.session_data[self.all_keys[i]]['dev_tools'] = dev_tools
+            self.session_data[self.all_keys[i]]['window_id'] = window_id
 
             return self.session_data
 
@@ -104,4 +120,13 @@ class Start:
             login_method = self.data[instance]['login_method']
 
             if login_method == 'google':
+                gui_methods.clicking_login_method(login_method=login_method)
+            elif login_method == 'apple':
                 pass
+            elif login_method == 'email':
+                pass
+            elif login_method == ' ':
+                pass
+            else:
+                print('############')
+                print('Are you sure you entered the correct login method? The available ones are google, apple, email')
