@@ -13,6 +13,7 @@ import traceback
 import executing_chrome as exe_chrome
 import pygetwindow
 import gui_methods
+import network
 
 PATH_web_scripts = str(pathlib.Path().resolve())
 PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
@@ -59,6 +60,7 @@ class Start:
             self.session_data[self.all_keys[i]]['driver'] = driver
             self.session_data[self.all_keys[i]]['dev_tools'] = dev_tools
             self.session_data[self.all_keys[i]]['window_id'] = window_id
+            self.session_data[self.all_keys[i]]['ready'] = False
 
             return self.session_data
 
@@ -71,7 +73,7 @@ class Start:
             print('This is your driver: ', driver)
             driver.get('https://leagueofkingdoms.com')
             try:
-                play_button = WebDriverWait(driver, 30)\
+                play_button = WebDriverWait(driver, 30) \
                     .until(EC.presence_of_element_located((By.XPATH, '//*[@id="top"]/div/div[2]/img[1]')))
 
                 play_button.click()
@@ -94,9 +96,9 @@ class Start:
                 tabs = instances[instance]['dev_tools'].list_tab()
                 print(tabs)
 
-                tab = instances[instance]['dev_tools'].list_tab()[0]
+                network_tab = network.enable_network(instances[instance]['dev_tools'])
 
-                self.session_data[instance]['tab'] = tab
+                self.session_data[instance]['tab'] = network_tab
 
                 print('Now you should only be seeing the loading screen,'
                       ' if you are seeing another tab please contact me')
@@ -108,7 +110,7 @@ class Start:
         for instance in instances:
             driver = instances[instance]['driver']
             try:
-                disable_notifications = WebDriverWait(driver, 200)\
+                disable_notifications = WebDriverWait(driver, 200) \
                     .until(EC.presence_of_element_located((By.XPATH, '//*[@id="onesignal-slidedown-cancel-button"]')))
                 disable_notifications.click()
             except:
@@ -116,11 +118,13 @@ class Start:
                 print(f'We could not find the notifications button for the given time-span for {instance[0]}')
                 continue
 
+    def login_kingdom(self):
         for instance in self.session_data:
             login_method = self.data[instance]['login_method']
 
             if login_method == 'google':
-                gui_methods.clicking_login_method(login_method=login_method)
+                pass
+                # gui_methods.clicking_login_method(login_method=login_method, browser_window=instances[instance]['window_id'])
             elif login_method == 'apple':
                 pass
             elif login_method == 'email':

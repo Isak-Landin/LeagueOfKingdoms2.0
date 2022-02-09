@@ -2,6 +2,6 @@
   "Account1": {
     "user-name": "utbisalan@gmail.com",
     "password": "Blaogon11%%",
-    "login-method": "google"
+    "login_method": "google"
   }
 }

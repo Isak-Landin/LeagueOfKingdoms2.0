@@ -52,6 +52,7 @@ def clicking_login_method(login_method, browser_window):
     finally:
         return logged_in
 
+
 def login_window(login_method):
     if login_method == 'google':
         authentication_window = pygetwindow.getWindowsWithTitle()[0]

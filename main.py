@@ -6,6 +6,7 @@ import pychrome
 import json
 from web_scripts import selenium_actions
 from web_scripts import executing_chrome as exe_chrome
+import network
 
 exe_chrome.remove_all_existing_instances()
 initiate_selenium_actions = selenium_actions.Start()
@@ -23,3 +24,6 @@ print('This is all the session data: ', instances_for_accounts)
 
 initiate_selenium_actions.get_to_kingdom(accounts=instances_for_accounts)
 
+start_time = time.time()
+while False in network.ready_to_go and time.time() - start_time < 600:
+    time.sleep(5)
