@@ -21,6 +21,29 @@ def focus(window_id):
         tries += 1
 
 
+def login_window(account, key_account):
+    logged_in = False
+    try:
+        if account[key_account]['login_method'] == 'google':
+            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
+                                              browser_window=account[key_account]['window_id'])
+        elif account[key_account]['login_method'] == 'apple':
+            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
+                                              browser_window=account[key_account]['window_id'])
+        elif account['login_method'] == 'email':
+            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
+                                              browser_window=account[key_account]['window_id'])
+        elif account['login_method'] == '':
+            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
+                                              browser_window=account[key_account]['window_id'])
+
+    except:
+        print("Couldn't login with login_window for: ", account)
+
+    finally:
+        return logged_in
+
+
 def clicking_login_method(login_method, browser_window):
     logged_in = False
     try:
@@ -28,6 +51,7 @@ def clicking_login_method(login_method, browser_window):
         focus(window)
 
         region = (window.topleft[0], window.topleft[1], window.width, window.height)
+
         login_button = pyautogui.locateOnScreen(f'{login_method}.png', region=region, confidence=0.85)
 
         counter = 0
@@ -53,12 +77,10 @@ def clicking_login_method(login_method, browser_window):
         return logged_in
 
 
-def login_window(login_method):
-    if login_method == 'google':
-        authentication_window = pygetwindow.getWindowsWithTitle()[0]
-    elif login_method == 'apple':
-        authentication_window = pygetwindow.getWindowsWithTitle()[0]
-    elif login_method == 'email':
-        authentication_window = pygetwindow.getWindowsWithTitle()[0]
-    elif login_method == '':
-        authentication_window = pygetwindow.getWindowsWithTitle()[0]
+def calculate_region(window):
+    region = (window.topleft[0], window.topleft[1], window.width, window.height)
+    return region
+
+
+
+

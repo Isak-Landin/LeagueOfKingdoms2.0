@@ -14,6 +14,7 @@ import executing_chrome as exe_chrome
 import pygetwindow
 import gui_methods
 import network
+import pyautogui
 
 PATH_web_scripts = str(pathlib.Path().resolve())
 PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
@@ -61,6 +62,7 @@ class Start:
             self.session_data[self.all_keys[i]]['dev_tools'] = dev_tools
             self.session_data[self.all_keys[i]]['window_id'] = window_id
             self.session_data[self.all_keys[i]]['ready'] = False
+            self.session_data[self.all_keys[i]]['logged_in'] = False
 
             return self.session_data
 
@@ -118,19 +120,33 @@ class Start:
                 print(f'We could not find the notifications button for the given time-span for {instance[0]}')
                 continue
 
-    def login_kingdom(self):
-        for instance in self.session_data:
-            login_method = self.data[instance]['login_method']
+    def login_kingdom(self, account):
+        logged_in = False
+        try:
 
-            if login_method == 'google':
-                pass
-                # gui_methods.clicking_login_method(login_method=login_method, browser_window=instances[instance]['window_id'])
-            elif login_method == 'apple':
-                pass
-            elif login_method == 'email':
-                pass
-            elif login_method == ' ':
-                pass
-            else:
-                print('############')
-                print('Are you sure you entered the correct login method? The available ones are google, apple, email')
+            login_method = self.data[account]['login_method']
+
+            if self.data[account]['logged_in'] is False:
+                time_start = time.time()
+                while pyautogui.locateOnScreen(r'images\started.png',
+                                               region=gui_methods.calculate_region(self.data[account]['window_id']),
+                                               confidence=0.85
+                                               ) is None and time.time() - time_start < 240:
+                    pass
+
+                if login_method == 'google':
+                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                elif login_method == 'apple':
+                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                elif login_method == 'email':
+                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                elif login_method == ' ':
+                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                else:
+                    print('############')
+                    print('Are you sure you entered the correct login method? The available ones are google, apple, email')
+        except:
+            print(traceback.print_exc())
+
+        finally:
+            self.data[account]['logged_in'] = logged_in

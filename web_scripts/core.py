@@ -1,4 +1,5 @@
-import pygetwindow
+dict1 = {
+    'test': 'test2'
+}
 
-all_titles = pygetwindow.getAllTitles()
-print(all_titles)
+print(dict1)
