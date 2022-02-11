@@ -1,5 +1,7 @@
-dict1 = {
-    'test': 'test2'
-}
+import pygetwindow
+import gui_methods
 
-print(dict1)
+print(pygetwindow.getAllTitles())
+
+
+chrome = pygetwindow.getWindowsWithTitle('Chrome')[0]

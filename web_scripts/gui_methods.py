@@ -3,7 +3,10 @@ import pygetwindow
 import cv2
 import traceback
 import time
+import pathlib
 
+
+PATH_web_scripts = str(pathlib.Path().resolve()) + r'\web_scripts'
 
 def focus(window_id):
     window_id.minimize()
@@ -21,24 +24,25 @@ def focus(window_id):
         tries += 1
 
 
-def login_window(account, key_account):
+def login_window(account_settings, accounts_temp_data, key_account):
     logged_in = False
     try:
-        if account[key_account]['login_method'] == 'google':
-            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
-                                              browser_window=account[key_account]['window_id'])
-        elif account[key_account]['login_method'] == 'apple':
-            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
-                                              browser_window=account[key_account]['window_id'])
-        elif account['login_method'] == 'email':
-            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
-                                              browser_window=account[key_account]['window_id'])
-        elif account['login_method'] == '':
-            logged_in = clicking_login_method(login_method=account[key_account]['login_method'],
-                                              browser_window=account[key_account]['window_id'])
+        if account_settings[key_account]['login_method'] == 'google':
+            logged_in = clicking_login_method(login_method=account_settings[key_account]['login_method'],
+                                              browser_window=accounts_temp_data[key_account]['window_id'])
+        elif account_settings[key_account]['login_method'] == 'apple':
+            logged_in = clicking_login_method(login_method=account_settings[key_account]['login_method'],
+                                              browser_window=accounts_temp_data[key_account]['window_id'])
+        elif account_settings[key_account]['login_method']:
+            logged_in = clicking_login_method(login_method=account_settings[key_account]['login_method'],
+                                              browser_window=accounts_temp_data[key_account]['window_id'])
+        elif account_settings[key_account]['login_method']:
+            logged_in = clicking_login_method(login_method=account_settings[key_account]['login_method'],
+                                              browser_window=accounts_temp_data[key_account]['window_id'])
 
     except:
-        print("Couldn't login with login_window for: ", account)
+        print(traceback.print_exc())
+        print("Couldn't login with login_window for: ", account_settings)
 
     finally:
         return logged_in
@@ -52,11 +56,16 @@ def clicking_login_method(login_method, browser_window):
 
         region = (window.topleft[0], window.topleft[1], window.width, window.height)
 
-        login_button = pyautogui.locateOnScreen(f'{login_method}.png', region=region, confidence=0.85)
+        login_button = pyautogui.locateOnScreen(PATH_web_scripts + '\\' + f'{login_method}.png',
+                                                region=region,
+                                                confidence=0.85)
 
         counter = 0
         while login_button is None and counter < 5:
-            login_button = pyautogui.locateOnScreen(f'{login_method}.png', region=region, confidence=0.85)
+            print('Looking in', )
+            login_button = pyautogui.locateOnScreen(PATH_web_scripts + '\\' + f'{login_method}.png',
+                                                    region=region,
+                                                    confidence=0.85)
 
             counter += 1
 
@@ -74,6 +83,8 @@ def clicking_login_method(login_method, browser_window):
         pass
 
     finally:
+        # temporary sleep
+        time.sleep(15)
         return logged_in
 
 

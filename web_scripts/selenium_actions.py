@@ -18,6 +18,7 @@ import pyautogui
 
 PATH_web_scripts = str(pathlib.Path().resolve())
 PATH_json_configs = str(pathlib.Path().resolve()) + r'\account_settings.json'
+Path_images = PATH_web_scripts + r'\images'
 
 
 class Start:
@@ -85,6 +86,7 @@ class Start:
                 current_handle = driver.current_window_handle
 
                 # Switch handle
+                time.sleep(1)
                 for new_handle in both_handles:
                     # switch focus to child window
                     if new_handle != current_handle:
@@ -112,36 +114,60 @@ class Start:
         for instance in instances:
             driver = instances[instance]['driver']
             try:
+                time.sleep(20)
                 disable_notifications = WebDriverWait(driver, 200) \
                     .until(EC.presence_of_element_located((By.XPATH, '//*[@id="onesignal-slidedown-cancel-button"]')))
                 disable_notifications.click()
             except:
                 print(traceback.print_exc())
                 print(f'We could not find the notifications button for the given time-span for {instance[0]}')
-                continue
+
+                disabled = False
+                try:
+                    disable_notifications = WebDriverWait(driver, 200) \
+                        .until(
+                        EC.presence_of_element_located((By.XPATH, '//*[@id="onesignal-slidedown-cancel-button"]')))
+
+                    while disable_notifications is False:
+                        print('Disabling notification pop-up')
+                        disable_notifications = WebDriverWait(driver, 200) \
+                            .until(
+                            EC.presence_of_element_located((By.XPATH, '//*[@id="onesignal-slidedown-cancel-button"]')))
+
+                        disabled = True
+                    disable_notifications.click()
+
+
+                except:
+                    print(traceback.print_exc())
+                    print(f'We could not find the notifications button for the given time-span for {instance[0]}')
+            continue
 
     def login_kingdom(self, account):
         logged_in = False
         try:
 
             login_method = self.data[account]['login_method']
-
-            if self.data[account]['logged_in'] is False:
-                time_start = time.time()
-                while pyautogui.locateOnScreen(r'images\started.png',
-                                               region=gui_methods.calculate_region(self.data[account]['window_id']),
-                                               confidence=0.85
-                                               ) is None and time.time() - time_start < 240:
-                    pass
+            print(account)
+            print(self.data[account])
+            if self.session_data[account]['logged_in'] is False:
 
                 if login_method == 'google':
-                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                    logged_in = gui_methods.login_window(account_settings=self.data,
+                                                         accounts_temp_data=self.session_data,
+                                                         key_account=account)
                 elif login_method == 'apple':
-                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                    logged_in = gui_methods.login_window(account_settings=self.data,
+                                                         accounts_temp_data=self.session_data,
+                                                         key_account=account)
                 elif login_method == 'email':
-                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                    logged_in = gui_methods.login_window(account_settings=self.data,
+                                                         accounts_temp_data=self.session_data,
+                                                         key_account=account)
                 elif login_method == ' ':
-                    logged_in = gui_methods.login_window(account=self.session_data[account], key_account=account)
+                    logged_in = gui_methods.login_window(account_settings=self.data,
+                                                         accounts_temp_data=self.session_data,
+                                                         key_account=account)
                 else:
                     print('############')
                     print('Are you sure you entered the correct login method? The available ones are google, apple, email')

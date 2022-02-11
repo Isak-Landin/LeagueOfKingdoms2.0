@@ -3,17 +3,11 @@ from selenium import webdriver
 import multiprocessing
 
 
-ready_to_go = []
-
-
 def output_on_start(**kwargs):
     print('Started', kwargs)
-    check_for_continuation(kwargs)
-
 
 def output_on_end(**kwargs):
     print('Finished', kwargs)
-    check_for_continuation(kwargs)
 
 
 def enable_network(pychrome_instance):
@@ -26,9 +20,3 @@ def enable_network(pychrome_instance):
 
     return tab
 
-
-def check_for_continuation(response, account):
-    if response == '':
-        return True
-    else:
-        return False
